@@ -16,7 +16,9 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from .views import CategoryListView
 
 urlpatterns = [
+    path('categories/', CategoryListView.as_view(), name='category-list'),
     path('admin/', admin.site.urls),
 ]
