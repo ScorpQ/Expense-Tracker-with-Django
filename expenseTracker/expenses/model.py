@@ -23,12 +23,22 @@ class Category(models.Model):
 
 
 class Expense(models.Model):
+    HIGH = 'HG'
+    MEDIUM = 'MD'
+    LOW = 'LW'
+    PRIORITY = {
+        HIGH: "High",
+        MEDIUM: "Medium",
+        LOW: "Low",
+    }
+    
     description = models.TextField (
         null=True, 
         db_column='description', 
         db_comment= 'Expense description'
     )
     amount = models.DecimalField(max_digits=10, decimal_places=2)
+    priority = models.CharField(max_length=15, choices=PRIORITY, default=MEDIUM)
     category = models.ForeignKey(Category, on_delete=models.PROTECT)
     date = models.DateField()
     created_at = models.DateTimeField(auto_now_add=True)
