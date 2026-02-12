@@ -4,12 +4,17 @@
       rm -rf venv
       python -m venv venv
 
+- run the project
+    python manage.py runserver
+
+- Başlamazsa local'de pg ayağa kaldırman lazım.
+    docker-compose.yml
+
 - bağımlılıkları kaydetmek için
     pip freeze > requirements.txt
 
 - bağımlılıklar için
     pip install -r  requirements.txt
-
 
 - migration for specific app 
     python manage.py makemigrations expenses
