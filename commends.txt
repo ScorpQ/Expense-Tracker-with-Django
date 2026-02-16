@@ -8,7 +8,7 @@
     python manage.py runserver
 
 - Başlamazsa local'de pg ayağa kaldırman lazım.
-    docker-compose.yml
+    docker-compose up
 
 - bağımlılıkları kaydetmek için
     pip freeze > requirements.txt
@@ -19,6 +19,12 @@
 - migration for specific app 
     python manage.py makemigrations expenses
     python manage.py migrate
+
+    - migration yaparken db'Den değil de kodun içini değiştirip migrate etmen best-practice
+
+    - migration dosyalarını listelemek için 'python manage.py showmigrations'
+
+    -
 
 
     
