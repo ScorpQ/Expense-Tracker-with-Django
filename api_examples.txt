@@ -1,0 +1,5 @@
+
+- Filtering:
+    http://127.0.0.1:8000/expenses/?start_date=2026-02-16
+    http://127.0.0.1:8000/expenses/?start_date=2026-02-16&category=3
+    http://127.0.0.1:8000/expenses/?category=3
