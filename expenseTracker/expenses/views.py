@@ -3,11 +3,14 @@ from django.http import HttpResponse, StreamingHttpResponse
 import django_filters
 from django.db.models import Sum
 from rest_framework import generics
+
+from expenseTracker.expenses.filters import ExpenseFilter
 from .model import Category, Expense
 from django.contrib.auth.models import User
 from django.utils.dateparse import parse_date
 from .serializing import CategorySerializer, UserSerializer, ExpenseSerializer
 
+from django_filters import rest_framework as filters
 
 ## LISTING ##
 class CategoryList(generics.ListCreateAPIView):
@@ -15,12 +18,10 @@ class CategoryList(generics.ListCreateAPIView):
     serializer_class = CategorySerializer
 
 class ExpenseList(generics.ListCreateAPIView):
+    queryset = Expense.objects.all()
     serializer_class = ExpenseSerializer
     filter_backends = [django_filters.rest_framework.DjangoFilterBackend]
-
-    ### http://127.0.0.1:8000/expenses/?start_date=2026-02-16
-    def get_queryset(self):
-        return get_filtered_expenses(self.request)
+    filterset_class = ExpenseFilter
 
     def list(self, request, *args, **kwargs):
         response = super().list(request, *args, **kwargs)
@@ -60,12 +61,12 @@ class Echo:
     def write(self, value):
         return value
 
-
 def some_streaming_csv_view(request):
-    queryset = get_filtered_expenses(request).select_related("category")
-
+    filter = ExpenseFilter(request.GET, queryset= Expense.objects.all())
+    queryset = filter.qs
+    print("COUNT:", queryset.count())
     def row_generator():
-        yield ["id", "description", "amount", "category", "date"]
+        yield ["id", "description", "amount", "category"]
 
         for expense in queryset.iterator():
             yield [
@@ -73,14 +74,19 @@ def some_streaming_csv_view(request):
                 expense.description,
                 expense.amount,
                 expense.category.name if expense.category else "",
-                expense.date,
+                expense.created_at
             ]
 
+    # Bu kısımları bir anlamaya çalış
     pseudo_buffer = Echo()
     writer = csv.writer(pseudo_buffer)
 
+    def stream():
+        for row in row_generator():
+            yield writer.writerow(row)
+
     return StreamingHttpResponse(
-        (writer.writerow(row) for row in row_generator()),
+        stream(),
         content_type="text/csv; charset=utf-8",
         headers={"Content-Disposition": 'attachment; filename="expenses.csv"'},
     )
@@ -92,7 +98,7 @@ def some_streaming_csv_view(request):
 ## FILTERING FUNC ###
 ### http://127.0.0.1:8000/expenses/?start_date=2026-02-16
 def get_filtered_expenses(request):
-
+    filter = ExpenseFilter(request.GET, queryset=Expense.objects.all())
     # Get all results from DB
     queryset = Expense.objects.all()
 
