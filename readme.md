@@ -2,6 +2,7 @@
 
 A simple **Expense Tracker REST API** built with **Django** and **Django REST Framework**.  
 This project provides backend services for managing expenses, categories, and related data.
+https://roadmap.sh/projects/expense-tracker
 
 ---
 
